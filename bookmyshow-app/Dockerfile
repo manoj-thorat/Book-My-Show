@@ -1,27 +1,34 @@
-# Use Node.js 18 (or your Jenkins-configured version)
+# Use Node.js 18
 FROM node:18
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files first
 COPY package.json package-lock.json ./
 
-# Force install a compatible PostCSS version to fix the issue
+# Fix postcss issue
 RUN npm install postcss@8.4.21 postcss-safe-parser@6.0.0 --legacy-peer-deps
 
-# Install dependencies
-RUN npm install
+# Disable optional deps like fsevents (macOS-only)
+ENV npm_config_optional=false
 
-# Copy the entire project
+# Install chokidar (to prevent webpack crash)
+RUN npm install chokidar@3 watchpack-chokidar2 --save-dev --legacy-peer-deps --force
+
+# Install remaining dependencies safely
+RUN npm install --legacy-peer-deps --force
+
+# Copy source code
 COPY . .
 
-# Expose port 3000
+# Expose React app port
 EXPOSE 3000
 
-# Set environment variable to prevent OpenSSL errors
+# Environment variables
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV PORT=3000
+ENV HOST=0.0.0.0
 
-# Start the application
+# Start application
 CMD ["npm", "start"]
