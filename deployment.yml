@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: bms-container
-        image: manojthorat/bms:latest  # Replace with your Docker image
+        image: manojthorat/bms  # Replace with your Docker image
         ports:
         - containerPort: 3000  # Replace with the port your app runs on
